@@ -1,0 +1,321 @@
+# BCD Adder using Verilog HDL
+
+## 📌 Project Title
+
+**Design and Simulation of a 1-Digit BCD Adder using Verilog HDL**
+
+## 📖 Introduction
+
+BCD stands for **Binary-Coded Decimal**.
+
+In BCD, each decimal digit is represented using 4 binary bits.
+
+For example:
+
+| Decimal |  BCD |
+| ------: | :--: |
+|       0 | 0000 |
+|       1 | 0001 |
+|       2 | 0010 |
+|       3 | 0011 |
+|       4 | 0100 |
+|       5 | 0101 |
+|       6 | 0110 |
+|       7 | 0111 |
+|       8 | 1000 |
+|       9 | 1001 |
+
+A **BCD Adder** is a digital circuit that adds two BCD digits and produces a valid BCD result.
+
+## 🔹 Inputs
+
+* `A[3:0]` – First BCD digit
+* `B[3:0]` – Second BCD digit
+* `Cin` – Input carry
+
+## 🔹 Outputs
+
+* `Sum[3:0]` – BCD sum digit
+* `Cout` – Decimal carry
+
+## 🔹 Working Principle
+
+First, the two BCD digits and input carry are added as normal binary numbers.
+
+```text
+Binary Sum = A + B + Cin
+```
+
+If the result is greater than 9, it is not a valid single BCD digit.
+
+Therefore, `0110` (decimal 6) is added as a correction.
+
+### BCD Correction Condition
+
+```text
+If Sum > 9:
+    Corrected Sum = Sum + 6
+    Cout = 1
+```
+
+Otherwise:
+
+```text
+Corrected Sum = Sum
+Cout = 0
+```
+
+## 🔹 Example 1
+
+Consider:
+
+```text
+5 + 3 = 8
+```
+
+BCD representation:
+
+```text
+0101 + 0011 = 1000
+```
+
+Since 8 is less than 10, no correction is required.
+
+```text
+Cout = 0
+Sum  = 1000
+```
+
+## 🔹 Example 2
+
+Consider:
+
+```text
+5 + 6 = 11
+```
+
+Binary addition:
+
+```text
+0101
++0110
+-----
+1011
+```
+
+`1011` represents decimal 11, which is invalid as a single BCD digit.
+
+Add 6:
+
+```text
+1011
++0110
+-----
+1 0001
+```
+
+Therefore:
+
+```text
+Cout = 1
+Sum  = 0001
+```
+
+The complete BCD result is:
+
+```text
+0001 0001
+```
+
+which represents decimal 11.
+
+## 🔹 Block Diagram
+
+```text
+             ┌─────────────────┐
+    A[3:0] ─►│                 │
+             │  Binary Adder   │
+    B[3:0] ─►│                 ├──► Binary Sum
+             │                 │
+      Cin ──►│                 │
+             └────────┬────────┘
+                      │
+                      ▼
+             ┌─────────────────┐
+             │ BCD Correction  │
+             │     + 0110      │
+             └────────┬────────┘
+                      │
+                      ├────► Sum[3:0]
+                      │
+                      └────► Cout
+```
+
+## 🔹 BCD Correction Logic
+
+The correction is required when the binary sum is greater than 9.
+
+```text
+Binary Sum > 9 → Add 0110
+Binary Sum ≤ 9 → No correction
+```
+
+## 💻 Verilog Implementation
+
+The main BCD correction logic is:
+
+```verilog
+Binary_Sum = A + B + Cin;
+
+if (Binary_Sum > 5'd9) begin
+    Binary_Sum = Binary_Sum + 5'd6;
+    Cout = 1'b1;
+end
+else begin
+    Cout = 1'b0;
+end
+
+Sum = Binary_Sum[3:0];
+```
+
+## 🧪 Testbench
+
+The testbench file is:
+
+```text
+bcd_adder_tb.v
+```
+
+It tests different BCD additions, including cases that require BCD correction.
+
+The testbench verifies:
+
+* Addition without correction
+* Addition requiring correction
+* Addition with input carry
+* Maximum valid BCD digit combinations
+
+## 📊 Verification Table
+
+| A    | B    | Cin | Cout |  Sum |
+| ---- | ---- | :-: | :--: | :--: |
+| 0010 | 0011 |  0  |   0  | 0101 |
+| 0100 | 0101 |  0  |   0  | 1001 |
+| 0101 | 0110 |  0  |   1  | 0001 |
+| 0111 | 1000 |  0  |   1  | 0101 |
+| 1001 | 0001 |  0  |   1  | 0000 |
+| 1000 | 0001 |  1  |   1  | 0000 |
+| 1001 | 1001 |  0  |   1  | 1000 |
+| 1001 | 1001 |  1  |   1  | 1001 |
+
+## 📊 Expected Simulation Output
+
+```text
+==============================================
+              BCD ADDER TEST
+==============================================
+ A     B    Cin | Cout  Sum
+----------------------------
+0010  0011    0  |  0    0101
+0100  0101    0  |  0    1001
+0101  0110    0  |  1    0001
+0111  1000    0  |  1    0101
+1001  0001    0  |  1    0000
+1000  0001    1  |  1    0000
+1001  1001    0  |  1    1000
+1001  1001    1  |  1    1001
+----------------------------
+Simulation completed successfully.
+```
+
+## 🛠️ Tools Used
+
+* Verilog HDL
+* Icarus Verilog
+* GTKWave
+* GitHub
+
+## ▶️ How to Run the Simulation
+
+### Step 1: Compile
+
+```bash
+iverilog -o bcd_sim bcd_adder.v bcd_adder_tb.v
+```
+
+### Step 2: Run
+
+```bash
+vvp bcd_sim
+```
+
+The simulation results will be displayed in the terminal.
+
+## 📁 Project Structure
+
+```text
+BCD-Adder/
+│
+├── README.md
+├── bcd_adder.v
+├── bcd_adder_tb.v
+└── simulation_output.txt
+```
+
+## 🎯 Objectives
+
+1. Understand Binary-Coded Decimal representation.
+2. Understand BCD addition.
+3. Understand why BCD correction is required.
+4. Design a BCD Adder using Verilog HDL.
+5. Write a Verilog testbench.
+6. Verify the design using simulation.
+7. Upload and document the project on GitHub.
+
+## ⭐ Advantages
+
+* Directly represents decimal digits.
+* Useful in decimal arithmetic systems.
+* Easy to display decimal results using digital displays.
+* Suitable for educational understanding of BCD arithmetic.
+
+## ⚠️ Disadvantages
+
+* Requires more bits than pure binary representation.
+* Additional correction logic is required.
+* Hardware complexity is higher than ordinary binary addition.
+
+## 📚 Applications
+
+BCD adders are used in:
+
+* Digital calculators
+* Digital clocks
+* Electronic counters
+* Seven-segment display systems
+* Decimal arithmetic circuits
+* Financial and commercial computing systems
+
+## 🔄 BCD Adder vs Binary Adder
+
+| Feature               | Binary Adder        | BCD Adder                |
+| --------------------- | ------------------- | ------------------------ |
+| Number representation | Binary              | Decimal digits in BCD    |
+| Correction            | Not required        | Required when result > 9 |
+| Hardware              | Simpler             | More complex             |
+| Decimal display       | Requires conversion | Directly suitable        |
+| Application           | General arithmetic  | Decimal arithmetic       |
+
+## ✅ Result
+
+The **1-digit BCD Adder** was successfully designed and simulated using Verilog HDL.
+
+The testbench verified BCD additions both with and without correction. The simulation results match the expected BCD arithmetic results.
+
+## 👨‍💻 Author
+
+**Your Name**
+
+## 📜 License
+
+This project is created for educational and academic purposes.
